@@ -68,7 +68,7 @@ const Navbar = () => {
                     {user ?
                     (<UserButton>
                         <UserButton.MenuItems>
-                            <UserButton.Action label='My Bookings' labelIcon={<BookIcon/>} onClick={()=> navigate('/My Bookings')} />
+                            <UserButton.Action label='My Bookings' labelIcon={<BookIcon/>} onClick={()=> navigate('/my-bookings')} />
                         </UserButton.MenuItems>
                     </UserButton>)
                     :
@@ -87,7 +87,7 @@ const Navbar = () => {
 
                     {user  && <UserButton>
                         <UserButton.MenuItems>
-                            <UserButton.Action label='My Bookings' labelIcon={<BookIcon/>} onClick={()=> navigate('/My Bookings')} />
+                            <UserButton.Action label='My Bookings' labelIcon={<BookIcon/>} onClick={()=> navigate('/my-bookings')} />
                         </UserButton.MenuItems>
                     </UserButton>}
                     <img onClick={()=> setIsMenuOpen(!isMenuOpen)} src= {assets.menuIcon} alt="" className= {`${isScrolled && "invert"} h-4`} />
