@@ -15,44 +15,44 @@ const MyBookings = () => {
 
         <div className='hidden md:grid md:grid-cols-[3fr_2fr_1fr] w-full border-b border-gray-300 font-medium text-base py-3'>
         <div className='w-1/3'> Hotels </div>
-        <div className='w-1/3'> Date & Timings </div>
-        <div className='w-1/3'> Payments </div>
+        <div className='w-1/3'> Manage Booking </div>
         </div>
 
         {bookings.map((bookings)=>(
             <div key={bookings._id} className='grid grid-cols-1 md:grid-cols-[3fr_2fr_1fr] w-full border-b border-gray-300 py-6 first:border-t'>
 
                 {/* The Hotel Details */}
-                <div>
+                <div className='flex gap-4'>
                     <img src={bookings.room.images[0]} alt='hotel-img' className='md:w-44 rounded shadow object-cover' />
-                </div>
 
-                <div className='flex items-center gap-1 text-sm text-gray-500' >
-                    <p className='font-playfair text-2xl'>{bookings.hotel.name}
-                        <span className='font-inter text-sm'>({bookings.room.roomType})</span>
-                    </p>
+                    <div className='flex flex-col gap-1'>
+                        <p className='font-playfair text-2xl'>{bookings.hotel.name}
+                            <span className='font-inter text-sm'>({bookings.room.roomType})</span>
+                        </p>
 
-                    <div className='flex items-center gap-1 text-sm text-gray-500'>
-                        <img src={assets.locationIcon} alt='location-Icon'/>
-                        <span>{bookings.hotel.address}</span>
+                        <div className='flex items-center gap-1 text-sm text-gray-500'>
+                            <img src={assets.locationIcon} alt='location-Icon'/>
+                            <span>{bookings.hotel.address}</span>
+                        </div>
+
+                        <div className='flex items-center gap-1 text-sm text-gray-500'>
+                            <img src={assets.guestsIcon} alt='guest-Icon'/>
+                            <span>Guests: {bookings.guests}</span>
+                        </div>
+
+                        <div className='flex items-center gap-1 text-sm text-gray-500'>
+                            <img src={assets.guestsIcon} alt='guest-Icon'/>
+                            <span>Booking Dates: {new Date(bookings.checkInDate).toLocaleDateString()} to {new Date(bookings.checkOutDate).toLocaleDateString()} </span>
+                        </div>
+                        <p className='text-base font-medium'>Total: ${bookings.totalPrice}</p>
                     </div>
 
-                    <div className='flex items-center gap-1 text-sm text-gray-500'>
-                        <img src={assets.guestsIcon} alt='guest-Icon'/>
-                        <span> Guests: {bookings.guests}</span>
-                    </div>
-                    <p>Total: ${bookings.totalPrice}</p>
-                    
                 </div>
 
-                {/* Date & Timings */}
-                <div>
-
-                </div>
-
-                {/* Payments */}
-                <div>
-
+                {/* Manage Bookings */}
+                <div className='flex flex-col'>
+                    <button>Amend</button>
+                    <button>Delete</button>
                 </div>
                 
             </div>

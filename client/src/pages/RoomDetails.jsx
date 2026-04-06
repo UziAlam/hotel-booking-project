@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { roomsDummyData, assets, facilityIcons } from "../assets/assets";
 import StarRating from "../components/StarRating";
-import Checkout from "../components/Checkout";
+
 
 const RoomDetails = () => {
   const { id } = useParams();
