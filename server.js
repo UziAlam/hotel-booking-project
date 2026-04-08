@@ -5,17 +5,19 @@ import connectDB from "./server/configs/db.js";
 import {clerkMiddleware} from '@clerk/express'
 import userRouter from "./server/routes/userRoutes.js";
 import hotelRouter from "./server/routes/hotelRoutes.js";
+import { clerkWebhooks } from "./server/controller/clerkWebhooks.js";
 
 connectDB ()
 
 const app = express()
-app.use (cors()) 
+app.use (cors())
 
 //MIDDLEWARE
 app.use(express.json())
 app.use(clerkMiddleware())
 
 app.get('/', (req, res)=> res.send("API is working"))
+app.post('/api/webhooks/clerk', clerkWebhooks)
 app.use('/api/user', userRouter)
 app.use('/api/hotels', hotelRouter)
 

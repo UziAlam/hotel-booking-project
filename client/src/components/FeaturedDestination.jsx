@@ -6,15 +6,18 @@ import { useNavigate } from 'react-router-dom'
 
 
 const FeaturedDestination = () => {
+  const featuredRooms = roomsDummyData.filter(
+    (room, index, rooms) => index === rooms.findIndex((item) => item.hotel._id === room.hotel._id)
+  ).slice(0, 4)
 
-  const navigate = useNavigate
+  const navigate = useNavigate()
   return (
     <div className='flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20'>
       <Title title='Featured Destination' subTitle='Discover our handpicked selection of exceptional properties around the world, offering unparalleled luxury and unforgettable experiences' />
       
 
       <div className='flex flex-wrap items-center justify-center gap-6 mt-20'>
-        {roomsDummyData.slice(0,4).map((room, index)=>(
+        {featuredRooms.map((room, index)=>(
             <HotelCard key={room._id} room={room} index={index} />
         ))}
       </div>
