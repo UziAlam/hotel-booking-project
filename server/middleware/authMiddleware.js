@@ -1,15 +1,22 @@
-import User from "../models/user.js";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-// Middleware to check if user is authenticated
+export const protect = async (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
 
-export const protect = async (req, res, next)=>{
-    const {userId} = req.auth;
-    if(!userId){
-        res.json({success: false, message: "Not Authorised"})
-    } else {
-        const user = await User.findById(userId);
-        req.user = user
-        next()
+    if (!token) {
+        return res.json({ success: false, message: "Not Authorised" });
     }
-}
 
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.json({ success: false, message: "Not Authorised" });
+        }
+        req.user = user;
+        next();
+    } catch (error) {
+        res.json({ success: false, message: "Not Authorised" });
+    }
+};
