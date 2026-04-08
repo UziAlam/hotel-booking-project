@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { roomsDummyData, assets, facilityIcons } from "../assets/assets";
 import StarRating from "../components/StarRating";
-
+import { useAppContext } from "../context/AppContext";
+import axios from "axios";
 
 const RoomDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, token, setShowLogin, BASE_URL } = useAppContext();
+
   const [room, setRoom] = useState(null);
   const [mainImage, setmainImage] = useState(null);
+  const [checkInDate, setCheckInDate] = useState("");
+  const [checkOutDate, setCheckOutDate] = useState("");
+  const [guests, setGuests] = useState(1);
 
   useEffect(() => {
     const room = roomsDummyData.find((room) => room._id === id);
@@ -15,13 +22,40 @@ const RoomDetails = () => {
     room && setmainImage(room.images[0]);
   }, []);
 
+  const handleBooking = async (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      setShowLogin(true);
+      return;
+    }
+
+    const { data } = await axios.post(
+      `${BASE_URL}/api/bookings`,
+      {
+        room: room._id,
+        hotel: room.hotel._id,
+        checkInDate,
+        checkOutDate,
+        guests,
+        pricePerNight: room.pricePerNight,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (data.success) {
+      navigate("/my-bookings");
+    } else {
+      alert(data.message);
+    }
+  };
+
   return (
     room && (
       <div className="py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32">
         {/* ROOM DETAILS */}
         <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
           <h1 className="text-3xl md:text-4xl font-playfair">
-            
             {room.hotel.name}
             <span className="font-inter text-sm"> ({room.roomType}) </span>
           </h1>
@@ -43,7 +77,6 @@ const RoomDetails = () => {
         </div>
 
         {/* ROOM IMAGES */}
-
         <div className="flex flex-col lg:flex-row mt-6 gap-6">
           <div className="lg:w-1/2 w-full">
             <img
@@ -66,7 +99,7 @@ const RoomDetails = () => {
           </div>
         </div>
 
-        {/*Room Highlights*/}
+        {/* Room Highlights */}
         <div className="flex flex-col md:flex-row md:justify-between mt-10">
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center mt-3 mb-6 gap-4">
@@ -75,11 +108,7 @@ const RoomDetails = () => {
                   key={index}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100"
                 >
-                  <img
-                    src={facilityIcons[item]}
-                    alt={item}
-                    className="w-5 h-5"
-                  />
+                  <img src={facilityIcons[item]} alt={item} className="w-5 h-5" />
                   <p className="text-xs">{item}</p>
                 </div>
               ))}
@@ -89,53 +118,56 @@ const RoomDetails = () => {
           {/* Room Price */}
           <p className="text-2xl font-medium">${room.pricePerNight}/Night</p>
         </div>
-        {/* <Checkout/>  I have created a component for the below just got the test. */}
 
         {/* Check-In and Check-out Form */}
-        <form className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-16 rounded-xl mx-auto mt-16 max-w-6xl ">
-          <div className=" flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500" >
-            
+        <form
+          onSubmit={handleBooking}
+          className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-16 rounded-xl mx-auto mt-16 max-w-6xl"
+        >
+          <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500">
+
             {/* CHECK IN */}
             <div className="flex flex-col">
-              <label htmlFor="checkInDate" className="font-medium"> Check-In </label>
+              <label htmlFor="checkInDate" className="font-medium">Check-In</label>
               <input
                 type="date"
                 id="checkInDate"
-                placeholder="Check-In"
+                value={checkInDate}
+                onChange={(e) => setCheckInDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
                 className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
               />
             </div>
 
-              {/* CHECK OUT */}
-              <div className="flex flex-col">
-              <label htmlFor="checkInDate" className="font-medium">
-                Check-Out
-              </label>
+            {/* CHECK OUT */}
+            <div className="flex flex-col">
+              <label htmlFor="checkOutDate" className="font-medium">Check-Out</label>
               <input
                 type="date"
-                id="checkInDate"
-                placeholder="Check-Out"
-                className="w-full rounded border border-gray-300  px-3 py-2 mt-1.5 outline-none"
-                required/>
-            </div>
-              {/* GUESTS */}
-            <div className="flex flex-col">
-              <label htmlFor="Guests" className="font-medium">
-                Guests
-              </label>
-              <input
-                type="number"
-                id="Guests"
-                placeholder="0"
-                className="max-w-20 rounded border border-gray-300  px-3 py-2 mt-1.5 outline-none"
+                id="checkOutDate"
+                value={checkOutDate}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                min={checkInDate || new Date().toISOString().split("T")[0]}
+                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
               />
             </div>
 
+            {/* GUESTS */}
+            <div className="flex flex-col">
+              <label htmlFor="guests" className="font-medium">Guests</label>
+              <input
+                type="number"
+                id="guests"
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                min={1}
+                className="max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
+                required
+              />
+            </div>
           </div>
-
-          
 
           <button
             type="submit"

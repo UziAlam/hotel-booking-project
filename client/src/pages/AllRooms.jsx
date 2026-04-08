@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { assets, facilityIcons, roomsDummyData } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 
 const CheckBox = ({label, selected = false, onChange = () => { }})=>{
     return (
-      <label className="flex gap-3 items-center cursor-pointer mt-2 text-sm"> 
+      <label className="flex gap-3 items-center cursor-pointer mt-2 text-sm">
         <input type="checkbox" checked={selected} onChange={(e)=>onChange(e.target.checked, label)}/>
         <span className="font-light select-none"> {label} </span>
       </label>
@@ -14,7 +14,7 @@ const CheckBox = ({label, selected = false, onChange = () => { }})=>{
 
 const RadioButton = ({label, selected = false, onChange = () => { }})=>{
     return (
-      <label className="flex gap-3 items-center cursor-pointer mt-2 text-sm"> 
+      <label className="flex gap-3 items-center cursor-pointer mt-2 text-sm">
         <input type="radio" name="sortOption" checked={selected} onChange={()=>onChange(label)}/>
         <span className="font-light select-none"> {label} </span>
       </label>
@@ -23,7 +23,17 @@ const RadioButton = ({label, selected = false, onChange = () => { }})=>{
 
 const AllRooms = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [openFitlers, setopenFilters] = useState(false)
+
+  const destination = searchParams.get("destination") || "";
+
+  const filteredRooms = useMemo(() => {
+    if (!destination) return roomsDummyData;
+    return roomsDummyData.filter(room =>
+      room.hotel.city.toLowerCase().includes(destination.toLowerCase())
+    );
+  }, [destination]);
   const roomTypes = [
     "Single Bed",
     "Double Bed",
@@ -54,7 +64,11 @@ const AllRooms = () => {
           </p>
         </div>
 
-        {roomsDummyData.map((room) => (
+        {filteredRooms.length === 0 && (
+          <p className="text-gray-500 mt-8">No rooms found for "{destination}".</p>
+        )}
+
+        {filteredRooms.map((room) => (
           <div
             className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last-pb-30 last:border-0"
             key={room._id}
